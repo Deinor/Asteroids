@@ -8,7 +8,18 @@ class PhysycalObjects(pyglet.sprite.Sprite):
 
         self.speed_x, self.speed_y = 0.0, 0.0
 
+        #Set up flag to define removing objects
         self.dead = False
+
+        #Set up flag if object is laser and if object should react to laser
+        self.is_laser = False
+        self.react_to_laser = True
+
+        #List of objects to add to game
+        self.new_objects = []
+
+        #Set up list of event handleres (keyboard, mouse imputs)
+        self.event_handlers = []
 
     def update(self, dt):
         """
@@ -18,6 +29,7 @@ class PhysycalObjects(pyglet.sprite.Sprite):
         self.y += self.speed_y * dt
 
         self.check_borders()
+
 
     def check_borders(self):
         """
@@ -42,8 +54,13 @@ class PhysycalObjects(pyglet.sprite.Sprite):
 
     def check_collision(self, other_object):
         """
-        Check for collision of two objects.
+        Check for collision of two objects, and if they shoud react to each other.
         """
+        #Check if objects should react to each other (laser with player etc.)
+        if not self.react_to_laser and other_object.is_laser:
+            return False
+        if self.is_laser and not other_object.react_to_laser:
+            return False
         #Find out colision distance
         collision_distance = self.image.width / 2 + other_object.image.width / 2
         #Load actual distance of two objects
@@ -54,4 +71,5 @@ class PhysycalObjects(pyglet.sprite.Sprite):
         """
         After collision set up dead.
         """
-        self.dead = True
+        if self.__class__ is not other_object.__class__:
+            self.dead = True

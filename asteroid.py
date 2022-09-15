@@ -1,10 +1,10 @@
 import pyglet
-from game import resources, load, gui, physycalobjects, player
+from game import load, gui, player
 
 #Game constants
 version = str(0.01)
 score = str(0)
-number_of_asteroids = 1
+number_of_asteroids = 5
 number_of_lives = 3
 
 #Create main batch
@@ -31,6 +31,11 @@ game_objects = [player_ship] + asteroids
 #Player object responds to key handlers
 game_window.push_handlers(player_ship.key_handler)
 
+#Add event handler to the stack
+for obj in game_objects:
+    for handler in obj.event_handlers:
+        game_window.push_handlers(handler)
+
 #Seting up event handler on_draw
 @game_window.event
 def on_draw():
@@ -41,10 +46,6 @@ def on_draw():
     main_batch.draw()
 
 def update(dt):
-    #Function updating game objects
-    for obj in game_objects:
-       obj.update(dt)
-
     for i in range(len(game_objects)):
     #Nested loop to avoid checking collisions twice and ceckink collision with it self
         for j in range(i + 1 , len(game_objects)):
@@ -56,12 +57,23 @@ def update(dt):
                 if obj_1.check_collision(obj_2):
                     obj_1.collision_action(obj_2)
                     obj_2.collision_action(obj_1)
+    
+    #List of objects added (spawned) while game is running, separete list to avoid changing the object list while iterating over it
+    to_add = []
+
+    #Function updating game objects
+    for obj in game_objects:
+       obj.update(dt)
+       to_add.extend(obj.new_objects)
+       obj.new_objects = []
 
     for remove_object in [obj for obj in game_objects if obj.dead]:
         #Remove object from batch
         remove_object.delete()
         #Remove object from game objects list
         game_objects.remove(remove_object)
+
+    game_objects.extend(to_add)
 
 if __name__ == '__main__':
 

@@ -18,9 +18,12 @@ pyglet.resource.reindex()
 player_image = pyglet.resource.image("player_ship_1.png")
 center_image(player_image)
 
-#Load asteroid image
-asteroid_image = pyglet.resource.image("asteroid.png")
-center_image(asteroid_image)
+#Load asteroids image
+asteroid_image_b1 = pyglet.resource.image("asteroid_b1.png")
+center_image(asteroid_image_b1)
+
+asteroid_image_m1 = pyglet.resource.image("asteroid_m1.png")
+center_image(asteroid_image_m1)
 
 #Load player laser image
 laser_image = pyglet.resource.image("player_laser.png")
