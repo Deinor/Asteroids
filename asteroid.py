@@ -4,7 +4,7 @@ from game import resources, load, gui, physycalobjects, player
 #Game constants
 version = str(0.01)
 score = str(0)
-number_of_asteroids = 10
+number_of_asteroids = 1
 number_of_lives = 3
 
 #Create main batch
@@ -26,7 +26,7 @@ player_ship = player.Player(x=640, y=350, batch=main_batch)
 asteroids = load.asteroids(number_of_asteroids,player_ship.position, main_batch)
 
 #List of game objects
-game_objects = asteroids + [player_ship]
+game_objects = [player_ship] + asteroids
 
 #Player object responds to key handlers
 game_window.push_handlers(player_ship.key_handler)
@@ -45,6 +45,23 @@ def update(dt):
     for obj in game_objects:
        obj.update(dt)
 
+    for i in range(len(game_objects)):
+    #Nested loop to avoid checking collisions twice and ceckink collision with it self
+        for j in range(i + 1 , len(game_objects)):
+            obj_1 = game_objects[i]
+            obj_2 = game_objects[j]
+
+            #Checks if objects are not already dead 
+            if not obj_1.dead and not obj_2.dead:
+                if obj_1.check_collision(obj_2):
+                    obj_1.collision_action(obj_2)
+                    obj_2.collision_action(obj_1)
+
+    for remove_object in [obj for obj in game_objects if obj.dead]:
+        #Remove object from batch
+        remove_object.delete()
+        #Remove object from game objects list
+        game_objects.remove(remove_object)
 
 if __name__ == '__main__':
 

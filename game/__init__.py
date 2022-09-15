@@ -1,1 +1,1 @@
-from . import resources, load, gui
+from . import resources, load, gui, player

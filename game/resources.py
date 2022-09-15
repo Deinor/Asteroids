@@ -26,6 +26,7 @@ center_image(asteroid_image)
 laser_image = pyglet.resource.image("player_laser.png")
 center_image(laser_image)
 
-#Load engine flame image
+#Load rear engine flame image
 engine_flame_image = pyglet.resource.image("engine_flame.png")
-center_image(engine_flame_image)
+engine_flame_image.anchor_x = engine_flame_image.width / 2
+engine_flame_image.anchor_y = engine_flame_image.height * 1.7

@@ -8,6 +8,8 @@ class PhysycalObjects(pyglet.sprite.Sprite):
 
         self.speed_x, self.speed_y = 0.0, 0.0
 
+        self.dead = False
+
     def update(self, dt):
         """
         Update position based on speed and time.
@@ -37,3 +39,19 @@ class PhysycalObjects(pyglet.sprite.Sprite):
             self.y = max_y
         if self.y > max_y:
             self.y = min_y
+
+    def check_collision(self, other_object):
+        """
+        Check for collision of two objects.
+        """
+        #Find out colision distance
+        collision_distance = self.image.width / 2 + other_object.image.width / 2
+        #Load actual distance of two objects
+        actual_distance = util.distance(self.position, other_object.position)
+        return (actual_distance <= collision_distance)
+
+    def collision_action(self, other_object):
+        """
+        After collision set up dead.
+        """
+        self.dead = True
