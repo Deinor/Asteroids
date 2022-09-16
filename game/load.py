@@ -1,7 +1,7 @@
 #Modul is setting up all objects loaded at the start of game
 import pyglet
 import random
-from . import resources, util, physycalobjects, asteroid
+from . import util, asteroid
 
 def asteroids (number_of_asteroids, player_position, batch=None):
     asteroids = []

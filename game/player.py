@@ -1,6 +1,6 @@
 import math
 from pyglet.window import key
-from pyglet import sprite
+from pyglet import sprite, image
 from . import physycalobjects, resources, weapons
 
 class Player (physycalobjects.PhysycalObjects):
