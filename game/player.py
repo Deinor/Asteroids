@@ -66,7 +66,7 @@ class Player (physycalobjects.PhysycalObjects):
 
     def on_key_press (self, symbol, modifiers):
         if symbol == key.SPACE:
-            self.fire()
+            self.fire()          
 
     def fire(self):
         """
@@ -98,6 +98,3 @@ class Player (physycalobjects.PhysycalObjects):
         """
         self.engine_sprite.delete()
         super(Player, self).delete()
-        
-
-

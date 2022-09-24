@@ -1,5 +1,6 @@
 import pyglet
-from game import load, gui, player, asteroid
+from pyglet.window import key
+from game import load, gui, player, asteroid, menu
 
 #Game constants
 version = str(0.01)
@@ -7,6 +8,7 @@ score = 0
 number_of_asteroids = 0
 number_of_lives = 3
 event_stack_size = 0
+game_objects = []
 
 #Create main batch
 main_batch = pyglet.graphics.Batch()
@@ -18,12 +20,45 @@ game_window = pyglet.window.Window(1280, 720)
 version_label = pyglet.text.Label(text=version, x=10, y=700, batch=main_batch)
 score_label = pyglet.text.Label(text="Score is: 0", x=200, y=700, batch=main_batch)
 
+def fce1():
+    reset_game()
+    run_game()
+
+def fce2():
+    print('Fce2 activated.')
+
+def fce3():
+    print('Fce3 activated.')
+
+main_menu_overlay = menu.MainMenu(fce1, fce2, fce3, main_batch)
+print(main_menu_overlay)
+
+def main_menu():
+    game_window.push_handlers(main_menu_overlay)
+
+def reset_game():
+    global number_of_asteroids, number_of_lives
+    number_of_asteroids = 1
+    number_of_lives = 3 
+    print(("reset"))   
+
 def init():
+    main_menu()
+    # run_game()
+
+def run_game():
+    game_window.remove_handlers(main_menu_overlay)
+    #Add event handler to the stack
+    for obj in game_objects:
+        for handler in obj.event_handlers:
+            game_window.push_handlers(handler)
+            event_stack_size += 1
+
     global number_of_asteroids
 
     number_of_asteroids = 3
     reset_level(number_of_lives)    
-
+ 
 def reset_level(number_of_lives):
     global player_ship, asteroids, game_objects, event_stack_size, player_live
 
@@ -43,7 +78,7 @@ def reset_level(number_of_lives):
     game_objects = [player_ship] + asteroids
 
     #Player object responds to key handlers
-    game_window.push_handlers(player_ship.key_handler)
+    game_window.push_handlers(player_ship.event_handlers)
 
     #Add event handler to the stack
     for obj in game_objects:
@@ -108,8 +143,7 @@ def update(dt):
         if number_of_lives > 0:
             reset_level(number_of_lives)
         else:
-            gui.game_over_label(main_batch)
-            gui.restart_game_label(main_batch)
+            pass
 
 if __name__ == '__main__':
 
