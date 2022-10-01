@@ -19,35 +19,41 @@ game_window = pyglet.window.Window(1280, 720)
 #Set up top static lables
 version_label = pyglet.text.Label(text=version, x=10, y=700, batch=main_batch)
 score_label = pyglet.text.Label(text="Score is: 0", x=200, y=700, batch=main_batch)
-
-def fce1():
-    reset_game()
-    run_game()
-
-def fce2():
-    print('Fce2 activated.')
-
-def fce3():
-    print('Fce3 activated.')
-
-main_menu_overlay = menu.MainMenu(fce1, fce2, fce3, main_batch)
-print(main_menu_overlay)
-
-def main_menu():
-    game_window.push_handlers(main_menu_overlay)
-
+      
 def reset_game():
     global number_of_asteroids, number_of_lives
     number_of_asteroids = 1
-    number_of_lives = 3 
-    print(("reset"))   
+    number_of_lives = 3  
 
 def init():
     main_menu()
-    # run_game()
+
+def start_game():
+    """
+    Run main game loop.
+    """
+    main_menu_obj.remove()
+    run_game()
+
+def test_2():
+    """
+    Options.
+    """
+    print('options')
+
+
+def test_3():
+    """
+    Exit.
+    """
+    print('exit')
+
+def main_menu():
+    global main_menu_obj
+    main_menu_obj = menu.MainMenu(start_game, test_2, test_3, main_batch)
+    game_window.push_handlers(main_menu_obj)
 
 def run_game():
-    game_window.remove_handlers(main_menu_overlay)
     #Add event handler to the stack
     for obj in game_objects:
         for handler in obj.event_handlers:
@@ -76,9 +82,6 @@ def reset_level(number_of_lives):
 
     #List of game objects
     game_objects = [player_ship] + asteroids
-
-    #Player object responds to key handlers
-    game_window.push_handlers(player_ship.event_handlers)
 
     #Add event handler to the stack
     for obj in game_objects:
@@ -122,6 +125,7 @@ def update(dt):
        obj.new_objects = []
 
     for remove_object in [obj for obj in game_objects if obj.dead]:
+
         #Remove object from batch
         remove_object.delete()
         #Remove object from game objects list
