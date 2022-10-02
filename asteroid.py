@@ -5,7 +5,7 @@ from game import load, gui, player, asteroid, menu
 #Game constants
 version = str(0.01)
 score = 0
-number_of_asteroids = 0
+number_of_asteroids_big = 0
 number_of_lives = 3
 event_stack_size = 0
 game_objects = []
@@ -21,8 +21,9 @@ version_label = pyglet.text.Label(text=version, x=10, y=700, batch=main_batch)
 score_label = pyglet.text.Label(text="Score is: 0", x=200, y=700, batch=main_batch)
       
 def reset_game():
-    global number_of_asteroids, number_of_lives
-    number_of_asteroids = 1
+    global number_of_asteroids_big, number_of_asteroids_medium, number_of_lives
+    number_of_asteroids_big = 1
+    number_of_asteroids_medium = 1
     number_of_lives = 3  
 
 def init():
@@ -60,9 +61,10 @@ def run_game():
             game_window.push_handlers(handler)
             event_stack_size += 1
 
-    global number_of_asteroids
+    global number_of_asteroids_big, number_of_asteroids_medium
 
-    number_of_asteroids = 3
+    number_of_asteroids_big = 2
+    number_of_asteroids_medium =2
     reset_level(number_of_lives)    
  
 def reset_level(number_of_lives):
@@ -78,10 +80,11 @@ def reset_level(number_of_lives):
 
     #Load objects
     player_ship = player.Player(x=640, y=350, batch=main_batch)
-    asteroids = load.asteroids(number_of_asteroids,player_ship.position, main_batch)
+    asteroids_big = load.asteroids_big(number_of_asteroids_big,player_ship.position, main_batch)
+    asteroids_medium = load.asteroids_medium(number_of_asteroids_medium,player_ship.position, main_batch)
 
     #List of game objects
-    game_objects = [player_ship] + asteroids
+    game_objects = [player_ship] + asteroids_big + asteroids_medium
 
     #Add event handler to the stack
     for obj in game_objects:
@@ -132,7 +135,12 @@ def update(dt):
         game_objects.remove(remove_object)               
 
         #Score is added when asteroid obj gets destroyed
-        if isinstance (remove_object, asteroid.Asteroid):
+        if isinstance (remove_object, asteroid.AsteroidBig):
+            #Check if deleted object is asteroid class
+            score += 1
+            score_label.text = f"Score is: {score}"
+        
+        if isinstance (remove_object, asteroid.AsteroidMedium):
             #Check if deleted object is asteroid class
             score += 1
             score_label.text = f"Score is: {score}"
