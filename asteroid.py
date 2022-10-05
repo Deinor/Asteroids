@@ -1,14 +1,20 @@
 import pyglet
 from pyglet.window import key
-from game import load, gui, player, asteroid, menu
+from game import load, gui, player, asteroid, menu, levels
 
 #Game constants
 version = str(0.01)
 score = 0
 number_of_asteroids_big = 0
+number_of_asteroids_medium = 0
+asteroids_big = []
+asteroids_medium = []
+
 number_of_lives = 3
 event_stack_size = 0
 game_objects = []
+level_number = 0
+game_on = False
 
 #Create main batch
 main_batch = pyglet.graphics.Batch()
@@ -34,41 +40,51 @@ def start_game():
     Run main game loop.
     """
     main_menu_obj.remove()
-    run_game()
+    game_window.pop_handlers()
+    run_game(number_of_lives, level_number)
+
+def set_new_level():
+    """
+    After clearing level creates massage and sets up variables for next level.
+    """
+    global level_number
+    for obj in game_objects:
+        obj.delete()
+    level_number += 1
+    number_of_lives = 3
+    main_menu_obj.remove()
+    game_window.pop_handlers()
+    run_game(number_of_lives, level_number)
 
 def test_2():
+
     """
     Options.
     """
     print('options')
 
-
-def test_3():
+def exit_game():
     """
     Exit.
     """
-    print('exit')
+    game_window.close()
 
 def main_menu():
     global main_menu_obj
-    main_menu_obj = menu.MainMenu(start_game, test_2, test_3, main_batch)
+    #main_menu_obj = menu.NextLevel(set_new_level, test_3, main_batch)
+    main_menu_obj = menu.MainMenu(start_game, test_2, exit_game, main_batch)
     game_window.push_handlers(main_menu_obj)
 
-def run_game():
-    #Add event handler to the stack
-    for obj in game_objects:
-        for handler in obj.event_handlers:
-            game_window.push_handlers(handler)
-            event_stack_size += 1
+def game_over():
+    menu.Banner('You got crushed by ateroids.', main_batch)
 
-    global number_of_asteroids_big, number_of_asteroids_medium
+def run_game(number_of_lives, level_number):
 
-    number_of_asteroids_big = 2
-    number_of_asteroids_medium =2
-    reset_level(number_of_lives)    
- 
-def reset_level(number_of_lives):
-    global player_ship, asteroids, game_objects, event_stack_size, player_live
+    global player_ship, asteroids, game_objects, event_stack_size, player_live, game_on
+
+    game_on = True
+
+    asteroids = levels.levels(level_number)
 
     #Clean up stack of event handleres before new level
     while event_stack_size > 0:
@@ -78,10 +94,11 @@ def reset_level(number_of_lives):
     #Player live sprite
     player_live = gui.player_lives(number_of_lives, main_batch)
 
+    global asteroids_big, asteroids_medium  
     #Load objects
     player_ship = player.Player(x=640, y=350, batch=main_batch)
-    asteroids_big = load.asteroids_big(number_of_asteroids_big,player_ship.position, main_batch)
-    asteroids_medium = load.asteroids_medium(number_of_asteroids_medium,player_ship.position, main_batch)
+    asteroids_big = load.asteroids_big(asteroids[0], player_ship.position, main_batch)
+    asteroids_medium = load.asteroids_medium(asteroids[1], player_ship.position, main_batch)
 
     #List of game objects
     game_objects = [player_ship] + asteroids_big + asteroids_medium
@@ -106,6 +123,9 @@ def update(dt):
 
     player_dead = False
 
+    #Sets up constant to check if are any asteroids left in game
+    asteroids_alive = 0
+
     for i in range(len(game_objects)):
     #Nested loop to avoid checking collisions twice and ceckink collision with it self
         for j in range(i + 1 , len(game_objects)):
@@ -127,12 +147,16 @@ def update(dt):
        to_add.extend(obj.new_objects)
        obj.new_objects = []
 
+       #Check if any asteroid is alive in game
+       if (isinstance(obj, asteroid.AsteroidBig) or isinstance(obj, asteroid.AsteroidMedium)):
+        asteroids_alive += 1       
+
     for remove_object in [obj for obj in game_objects if obj.dead]:
 
         #Remove object from batch
         remove_object.delete()
         #Remove object from game objects list
-        game_objects.remove(remove_object)               
+        game_objects.remove(remove_object)        
 
         #Score is added when asteroid obj gets destroyed
         if isinstance (remove_object, asteroid.AsteroidBig):
@@ -153,9 +177,21 @@ def update(dt):
     if player_dead:
         number_of_lives -= 1
         if number_of_lives > 0:
-            reset_level(number_of_lives)
+            run_game(number_of_lives)
         else:
-            pass
+            game_over()
+
+    global main_menu_obj
+
+    if  asteroids_alive == 0 and game_on and not isinstance(main_menu_obj, menu.NextLevel):
+        #Checks if wining conditions are fulfilled and lets player choose to start next level or exit game
+        
+        #TODO pop player handleres in menu
+        #game_window.pop_handlers()
+        
+        main_menu_obj = menu.NextLevel(set_new_level, exit_game, main_batch)
+        game_window.push_handlers(main_menu_obj)
+        
 
 if __name__ == '__main__':
 

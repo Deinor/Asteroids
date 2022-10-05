@@ -4,7 +4,7 @@ import random
 from . import util, asteroid
 
 def asteroids_big (number_of_asteroids_big, player_position, batch=None):
-    asteroids = []
+    asteroids_big = []
     for i in range(number_of_asteroids_big):
         asteroid_x, asteroid_y = player_position
         while util.distance((asteroid_x, asteroid_y), player_position) < 200: 
@@ -13,8 +13,8 @@ def asteroids_big (number_of_asteroids_big, player_position, batch=None):
         new_asteroid = asteroid.AsteroidBig(x=asteroid_x, y=asteroid_y, batch=batch)
         new_asteroid.rotation = random.randint(0.0, 360.0)
         new_asteroid.speed_x, new_asteroid.speed_y = random.random() * 60, random.random() * 60
-        asteroids.append(new_asteroid)
-    return asteroids 
+        asteroids_big.append(new_asteroid)
+    return asteroids_big
 
 def asteroids_medium (number_of_asteroids_medium, player_position, batch=None):
     asteroids_medium = []
